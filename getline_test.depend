@@ -1,0 +1,7 @@
+# depslib dependency file v1.0
+1542127315 source:d:\cpp\getline_test\main.cpp
+	<iostream>
+	<fstream>
+	<iostream>
+	<string.h>
+
