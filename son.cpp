@@ -1,3 +1,4 @@
+
 #include <iostream>
 #include <iomanip>
 #include <fstream>
@@ -37,67 +38,76 @@ const string DATATYPE_FILE[] = { "temperature.txt", "rainfall.txt", "sunshine.tx
 // the data number 'data' for month number 'month' for city number 'city'
 double DATABASE[MAX_DATATYPE][MAX_CITY][MAX_MONTH];
 
-bool more();
+void initialize(bool[], int); 
+void print_out(string, string);
+void analyzeInput(string, bool[], int);
 void display(string, string, string);
+bool more();
 
 int main()
 {
     ifstream inFile;
-    string input1, input2, input3;
+    string input;
     bool setCity[MAX_CITY], setDatatype[MAX_DATATYPE], setMonth[MAX_MONTH];
+    initialize(setCity,MAX_CITY);
+    initialize(setDatatype,MAX_DATATYPE);
+    initialize(setMonth,MAX_MONTH);
+
+/*-------------------------------------------------------------------------------*/
     inFile.open(CITY_NAME_FILE.c_str());
     for (int i=0; i<MAX_CITY; i++)
         inFile >> CITY_NAME[i];
     inFile.close();
     cout << "Welcome to CLIMATE++\n" << endl;
     do{
-    cout << "Choose the cities" << endl
-         << "Austin(1) Boston(2) Chicago(3) Fresno(4) Houston(5) Indianapolis(6) Memphis(7) Nashville(8) Phoenix(9) Washington(10)" << endl
-         << "Your choice: ";
-    getline(cin,input1);
-    cout << "Choose the data" << endl
-         << "Temperature(1) Rainfall(2) Sunshine hours(3)" << endl
-         << "Your choice: ";
-    getline(cin,input2);
-    cout << "Choose the month" << endl
-         << "January(1) February(2) March(3) April(4) May(5) June(6) July(7) August(8) September(9) October(10) November(11) December(12)" << endl
-         << "Your choice: ";
-    getline(cin,input3);
-    display(input1, input2, input3);
+    print_out("cities", "Austin(1) Boston(2) Chicago(3) Fresno(4) Houston(5) Indianapolis(6) Memphis(7) Nashville(8) Phoenix(9) Washington(10)");
+    analyzeInput(input, setCity, MAX_CITY);
+    print_out("datatype", "temperature(1) rainfall(2) sunshine hours(3)");
+    analyzeInput(input, setDatatype, MAX_DATATYPE);
+    print_out("month", "January(1) February(2) March(3) April(4) May(5) June(6) July(7) August(8) September(9) October(10) November(11) December(12)");
+    analyzeInput(input, setMonth, MAX_MONTH);
+    //display(input1, input2, input3);
     } while (more());
-    cout << "\n\nThank you for using CLIMATE++";
+    cout << "\n\nThank you for using CLIMATE++" << endl;
     return 0;
 }
 
-bool more()
+void initialize(bool set[], int max)
 {
-    string choice;
-    do
-    {
-        cout << "Do you want to continue (enter 'yes' or 'no')? ";
-        cin >> choice;
-        cin.ignore();
-        if (choice == "yes")
-            return true;
-    } while (choice!="no");
-    return false;
+    for(int i=0; i<max; i++)
+	set[i]=false;
 }
 
-void display(string input1, string input2, string input3)
+void print_out(string name, string inf)
+{
+   cout << "Choose the " << name << endl
+        << inf << endl
+        << "Your choice: ";
+}
+
+void analyzeInput(string input, bool set[], int max)
+{
+    getline(cin,input);
+    istringstream iss(input);
+    int n;
+    while (iss >> n)
+	if (0<n && n<=max && !set[n-1])
+	    set[n-1]=true;
+}
+
+void display(bool set1[], bool set2[], bool set3[])
 {
     int Count[MAX_MONTH];
     ifstream inFile;
     string in;
-    int n1, n2, n3, cmin, cmax, count, k;
+    int n1, n2, n3, cmin, cmax, count, k, i=0;
     double min, max, average=0, n;
-    istringstream iss1(input1);
-    while (iss1 >> n1)
-    {
-        cout << "-----------------------------------------------------" << endl
-             << "Data for " << CITY_NAME[n1-1] << ":\n" << endl;
-        istringstream iss2(input2);
-        while (iss2 >> n2)
+    while (i<MAX_CITY)
+    	if (set1[i])
         {
+        cout << "-----------------------------------------------------" << endl
+             << "Data for " << CITY_NAME[i-1] << ":\n" << endl;
+            {
             inFile.open(DATATYPE_FILE[n2-1].c_str());
             do{
             inFile >> in;
@@ -132,4 +142,18 @@ void display(string input1, string input2, string input3)
         }
         cout << "\n-----------------------------------------------------" << endl;
     }
+}
+
+bool more()
+{
+    string choice;
+    do
+    {
+        cout << "Do you want to continue (enter 'yes' or 'no')? ";
+        cin >> choice;
+        cin.ignore();
+        if (choice == "yes")
+            return true;
+    } while (choice!="no");
+    return false;
 }
