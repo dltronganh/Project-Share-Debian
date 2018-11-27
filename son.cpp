@@ -41,7 +41,9 @@ double DATABASE[MAX_DATATYPE][MAX_CITY][MAX_MONTH];
 void initialize(bool[], int); 
 void print_out(string, string);
 void analyzeInput(string, bool[], int);
-void display(string, string, string);
+void display(bool[], bool[], bool[]);
+int print_out2(bool[]);
+int openFile(bool[], ifstream&);
 bool more();
 
 int main()
@@ -66,7 +68,7 @@ int main()
     analyzeInput(input, setDatatype, MAX_DATATYPE);
     print_out("month", "January(1) February(2) March(3) April(4) May(5) June(6) July(7) August(8) September(9) October(10) November(11) December(12)");
     analyzeInput(input, setMonth, MAX_MONTH);
-    //display(input1, input2, input3);
+    display(setCity, setDatatype, setMonth);
     } while (more());
     cout << "\n\nThank you for using CLIMATE++" << endl;
     return 0;
@@ -95,53 +97,46 @@ void analyzeInput(string input, bool set[], int max)
 	    set[n-1]=true;
 }
 
-void display(bool set1[], bool set2[], bool set3[])
+void display(bool setCity[], bool setDatatype[], bool setMonth[])
 {
-    int Count[MAX_MONTH];
     ifstream inFile;
-    string in;
-    int n1, n2, n3, cmin, cmax, count, k, i=0;
-    double min, max, average=0, n;
-    while (i<MAX_CITY)
-    	if (set1[i])
+    string name;
+    int l=0;
+    double m;
+    int n=print_out2(setCity);
+    int k=openFile(setDatatype, inFile);
+    while (inFile >> name)
+	if (name == CITY_NAME[n])
+	    break;
+    cout << DATATYPE_NAME[k] << ":" << endl;
+    for (int i=0; i<MAX_MONTH; i++)
+	if (setMonth[i])
         {
-        cout << "-----------------------------------------------------" << endl
-             << "Data for " << CITY_NAME[i-1] << ":\n" << endl;
-            {
-            inFile.open(DATATYPE_FILE[n2-1].c_str());
-            do{
-            inFile >> in;
-            }
-            while (in!=CITY_NAME[n1-1]);
-            cout << DATATYPE_NAME[n2-1] << ":" << endl;
-            istringstream iss3(input3);
-            iss3 >> n3;
-            for (int i=0; i<n3; i++)
-                inFile >> n;
-            cout << setw(10) << n;
-            min=n; max=n; average=n; cmin=n3; cmax=n3; count=1; Count[0]=n3; k=n3;
-            while (iss3 >> n3)
-            {
-                for (int i=k; i<n3; i++)
-                    inFile >> n;
-                cout << setw(10) << fixed << showpoint << setprecision(2) << n;
-                if (n<min) {min=n; cmin=n3;}
-                if (n>max) {max=n; cmax=n3;}
-                average+=n;
-                Count[count]=n3;
-                count++;
-                k=n3;
-            }
-            inFile.close();
-            cout << endl;
-            for (int i=0; i<count; i++)
-                cout << setw(10) << fixed << showpoint << setprecision(2) << MONTH_NAME[Count[i]-1];
-            cout << "\nMinimum value occurs in " << MONTH_NAME[cmin-1] << ": " << fixed << showpoint << setprecision(2) << min << endl
-                 << "Maximum value occurs in " << MONTH_NAME[cmax-1] << ": " << fixed << showpoint << setprecision(2) << max << endl
-                 << "Average value: " << fixed << showpoint << setprecision(2) << average/count << endl << endl;
-        }
-        cout << "\n-----------------------------------------------------" << endl;
-    }
+	    for (;l=i;l++)
+		inFile >> m; 
+	    cout << setw(10) << m;
+	} 
+}
+
+int print_out2(bool set[])
+{
+    cout << "---------------------------------------" << endl;
+    int i=0;
+    while ((i<MAX_CITY) && (!set[i]))
+	i++;
+    cout << "Data for " << CITY_NAME[i] << ":\n" << endl << endl;
+    set[i]=false;
+    return i;
+}
+
+int openFile(bool set[], ifstream &inFile)
+{
+    int i=0;
+    while ((i<MAX_DATATYPE) && (!set[i]))
+	i++;
+    inFile.open(DATATYPE_FILE[i].c_str());
+    set[i]=false;
+    return i;
 }
 
 bool more()
@@ -149,7 +144,8 @@ bool more()
     string choice;
     do
     {
-        cout << "Do you want to continue (enter 'yes' or 'no')? ";
+	cout << "---------------------------------------------------" << endl
+             << "Do you want to continue (enter 'yes' or 'no')? ";
         cin >> choice;
         cin.ignore();
         if (choice == "yes")
